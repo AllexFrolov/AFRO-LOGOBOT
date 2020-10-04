@@ -13,13 +13,13 @@ def text_to_pic(text: str) -> np.array:
     :return: (numpy.array) array of shape (100, 200, 3)
     """
     # create canvas
-    canvas = np.full((500, 500, 3), 255, dtype=np.uint8)
+    canvas = np.full((500, 500, 3), 0, dtype=np.uint8)
     # choice random color
     color = tuple(np.random.choice(255) for _ in range(3))
     # choice random font
     font = np.random.choice(8)
-    fontScale = 2
-    thickness = 2
+    fontScale = 3
+    thickness = 3
     x, y = get_center(text, canvas, font, fontScale)
 
     canvas = cv2.putText(canvas, text, (x, y), font, fontScale, color, thickness)
@@ -52,19 +52,20 @@ class Transformer:
             A.OneOf([
                 A.GridDistortion(7, 1., cv2.INTER_LINEAR, cv2.BORDER_REFLECT, p=.8),
                 A.ElasticTransform(1., alpha_affine=50, interpolation=cv2.INTER_CUBIC,
-                                   border_mode=cv2.BORDER_CONSTANT, value=(255, 255, 255), p=.8)
-            ]),
+                                   border_mode=cv2.BORDER_CONSTANT, value=(0, 0, 0), p=.8)
+            ], p=.5),
             A.OneOf([
-                A.Rotate(30, cv2.INTER_NEAREST, cv2.BORDER_REFLECT_101),
-                A.Rotate(30, cv2.INTER_NEAREST, cv2.BORDER_REPLICATE),
-                A.Rotate(30, cv2.INTER_NEAREST, cv2.BORDER_WRAP)
-            ], p=1.),
+                A.Rotate(10, cv2.INTER_NEAREST, cv2.BORDER_REFLECT_101),
+                A.Rotate(10, cv2.INTER_NEAREST, cv2.BORDER_REPLICATE),
+                A.Rotate(10, cv2.INTER_NEAREST, cv2.BORDER_WRAP)
+            ], p=0.5),
             A.OneOf([
                 A.MotionBlur((15, 30)),
                 A.MedianBlur(blur_limit=3, p=0.5),
                 A.Blur(blur_limit=3, p=0.5),
-            ], p=0.2),
+            ], p=0.5),
             A.ShiftScaleRotate(shift_limit=0.0625, scale_limit=0.2, rotate_limit=45, p=0.2),
+            A.Resize(128, 128, cv2.INTER_CUBIC)
         ])
 
     def __call__(self, img: Any) -> Any:
