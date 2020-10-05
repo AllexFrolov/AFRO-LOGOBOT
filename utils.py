@@ -1,10 +1,12 @@
-from typing import Tuple, Any, Optional
 import re
+from typing import Tuple, Any, Optional
 
 import albumentations as A
 import cv2
 import numpy as np
+import pandas as pd
 from nltk.stem import WordNetLemmatizer
+from tqdm import notebook
 
 lemmatizer = WordNetLemmatizer()
 
@@ -135,7 +137,7 @@ def tokenize(text: str, tokenizer: Any) -> str:
         space_index = text.strip().rfind(' ', 0, 510)
         if space_index == -1:
             space_index = 510
-        return tokenizer.encode(text[:space_index])[1:-1] + tokenize(text[space_index:])
+        return tokenizer.encode(text[:space_index])[1:-1] + tokenize(text[space_index:], tokenizer)
     else:
         return tokenizer.encode(text)[1:-1]
 
@@ -152,3 +154,31 @@ def find_file(file_name: str) -> Optional[str]:
         return any_data
     except:
         return None
+
+
+def tokenize_and_write_file(texts: pd.Series, file_name: str,
+                            tokenizer: Any, batch_size=1000):
+    """
+    Tokenized texts and save in file
+    :param texts: (pd.Series) texts
+    :param file_name: (str)
+    :param tokenizer: (func)
+    :param batch_size: (int) save every batch_size
+    :return: NoneType
+    """
+    last_index = int(find_file(file_name) or 0)
+
+    with notebook.tqdm(total=texts.shape[0]) as progress_bar:
+        progress_bar.update(last_index)
+
+        for start_batch in range(last_index, texts.shape[0], batch_size):
+            end_batch = min(start_batch + batch_size, texts.shape[0])
+            token_batch = ''
+
+            for ind in texts.index[start_batch: end_batch]:
+                token_batch += str([101] + tokenize(texts.loc[ind], tokenizer) + [102])[1:-1] + '\n'
+            with open(file_name, 'a') as f:
+                f.write(token_batch)
+            with open(file_name[:-3] + 'txt', 'w') as f:
+                f.write(f'{end_batch}')
+            progress_bar.update(end_batch - start_batch)
