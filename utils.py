@@ -1,4 +1,4 @@
-from typing import Tuple, Any
+from typing import Tuple, Any, Optional
 import re
 
 import albumentations as A
@@ -138,3 +138,17 @@ def tokenize(text: str, tokenizer: Any) -> str:
         return tokenizer.encode(text[:space_index])[1:-1] + tokenize(text[space_index:])
     else:
         return tokenizer.encode(text)[1:-1]
+
+
+def find_file(file_name: str) -> Optional[str]:
+    """
+    Read and return first line in file.
+    :param file_name: (str) full path to fiile
+    :return: ([str]) file
+    """
+    try:
+        with open(file_name[:-3] + 'txt', 'r') as f:
+            any_data = f.readline()
+        return any_data
+    except:
+        return None
