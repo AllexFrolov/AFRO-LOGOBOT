@@ -80,10 +80,33 @@ class Transformer:
 transformer = Transformer()
 
 
-def convert_to_pic(text: str) -> np.array:
+def text_to_pic_transform(text: str) -> np.array:
     """
     Convert text to picture and added augmentations
     :param text: (str) Text
     :return: (np.array)
     """
     return transformer(text_to_pic(text))
+
+
+def join_images(text_im: np.array, icom_im: np.array) -> np.array:
+    brows, bcols = icom_im.shape[:2]
+    rows, cols, channels = text_im.shape
+
+    roi = icom_im[int(brows / 2) - int(rows / 2):int(brows / 2) + int(rows / 2),
+          int(bcols / 2) - int(cols / 2):int(bcols / 2) + int(cols / 2)]
+
+    img2gray = cv2.cvtColor(text_im, cv2.COLOR_BGR2GRAY)
+    ret, mask = cv2.threshold(img2gray, 10, 255, cv2.THRESH_BINARY)
+    # mask = cv2.adaptiveThreshold(img2gray, 1, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
+    mask_inv = cv2.bitwise_not(mask)
+
+    img1_bg = cv2.bitwise_and(roi, roi, mask=mask_inv)
+
+    img2_fg = cv2.bitwise_and(text_im, text_im, mask=mask)
+
+    dst = cv2.add(img1_bg, img2_fg.astype(float) / 255.)
+    icom_im[int(brows / 2) - int(rows / 2):int(brows / 2) + int(rows / 2),
+    int(bcols / 2) - int(cols / 2):int(bcols / 2) + int(cols / 2)] = dst
+
+    return icom_im
