@@ -49,7 +49,7 @@ def get_center(text: str, canvas: np.array, font: int, fontScale: int) -> Tuple[
     return text_x, text_y
 
 
-class Transformer:
+class Transformer(object):
     def __init__(self):
         """
         init albumentation augmentations
@@ -94,6 +94,13 @@ def text_to_pic_transform(text: str) -> np.array:
 
 
 def join_images(text_im: np.array, icon_im: np.array) -> np.array:
+    """
+    add text image to icon image.
+    :param text_im: (np.array) text image
+    :param icon_im: (np.array) icon image
+    :return: (np.array) joined image
+    """
+
     brows, bcols = icon_im.shape[:2]
     rows, cols, channels = text_im.shape
 
