@@ -3,6 +3,9 @@ from typing import Tuple, Any
 import albumentations as A
 import cv2
 import numpy as np
+from nltk.stem import WordNetLemmatizer
+
+lemmatizer = WordNetLemmatizer()
 
 
 def text_to_pic(text: str) -> np.array:
@@ -77,15 +80,13 @@ class Transformer:
         return self.transform(image=img)['image']
 
 
-transformer = Transformer()
-
-
 def text_to_pic_transform(text: str) -> np.array:
     """
     Convert text to picture and added augmentations
     :param text: (str) Text
     :return: (np.array)
     """
+    transformer = Transformer()
     return transformer(text_to_pic(text))
 
 
@@ -110,3 +111,14 @@ def join_images(text_im: np.array, icon_im: np.array) -> np.array:
     int(bcols / 2) - int(cols / 2):int(bcols / 2) + int(cols / 2)] = dst
 
     return icon_im
+
+
+def lemmatize_and_clearing(text: str) -> str:
+    """
+    lemmatize text and save symbols only
+    :param text: (str) text
+    :return: (str) lemmatized text
+    """
+    clear_list = ' '.join(re.sub(r'\\n|\W|\d', ' ', text).split()).lower()
+    lemm_list = lemmatizer.lemmatize(clear_list)
+    return ''.join(lemm_list)
