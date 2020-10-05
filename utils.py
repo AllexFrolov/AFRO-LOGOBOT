@@ -1,4 +1,5 @@
 from typing import Tuple, Any
+import re
 
 import albumentations as A
 import cv2
@@ -122,3 +123,18 @@ def lemmatize_and_clearing(text: str) -> str:
     clear_list = ' '.join(re.sub(r'\\n|\W|\d', ' ', text).split()).lower()
     lemm_list = lemmatizer.lemmatize(clear_list)
     return ''.join(lemm_list)
+
+
+def tokenize(text: str, tokenizer: Any) -> str:
+    """Splits a string into substrings of no more than 510 length and tokenizes
+    :param text: (str) text
+    :param tokenizer: (func) tokenizer
+    :return: (str) tokenized text
+    """
+    if len(text) > 510:
+        space_index = text.strip().rfind(' ', 0, 510)
+        if space_index == -1:
+            space_index = 510
+        return tokenizer.encode(text[:space_index])[1:-1] + tokenize(text[space_index:])
+    else:
+        return tokenizer.encode(text)[1:-1]
