@@ -7,6 +7,7 @@ import numpy as np
 import pandas as pd
 from nltk.stem import WordNetLemmatizer
 from tqdm import notebook
+import torch
 
 lemmatizer = WordNetLemmatizer()
 
@@ -93,14 +94,14 @@ def text_to_pic_transform(text: str) -> np.array:
     return transformer(text_to_pic(text))
 
 
-def join_images(text_im: np.array, icon_im: np.array) -> np.array:
+def add_text_to_img(text: str, icon_im: np.array) -> np.array:
     """
     add text image to icon image.
-    :param text_im: (np.array) text image
+    :param text: (str) text
     :param icon_im: (np.array) icon image
     :return: (np.array) joined image
     """
-
+    text_im = text_to_pic_transform(text)
     brows, bcols = icon_im.shape[:2]
     rows, cols, channels = text_im.shape
 
@@ -163,29 +164,28 @@ def find_file(file_name: str) -> Optional[str]:
         return None
 
 
-def tokenize_and_write_file(texts: pd.Series, file_name: str,
-                            tokenizer: Any, batch_size=1000):
+def embed_and_write_file(loader: Any, model: Any, device: torch.device, file_name: str):
     """
-    Tokenized texts and save in file
-    :param texts: (pd.Series) texts
-    :param file_name: (str)
-    :param tokenizer: (func)
-    :param batch_size: (int) save every batch_size
+    convert vec to embedding and save to file
+    :param loader: (Any) DataLoader
+    :param model: (Any) Embed_model
+    :param device: (torch.device)
+    :param file_name: (str) path to save the file
     :return: NoneType
     """
-    last_index = int(find_file(file_name) or 0)
+    if device.type == 'cuda':
+        from torch.cuda import LongTensor
+    else:
+        from torch import LongTensor
 
-    with notebook.tqdm(total=texts.shape[0]) as progress_bar:
-        progress_bar.update(last_index)
-
-        for start_batch in range(last_index, texts.shape[0], batch_size):
-            end_batch = min(start_batch + batch_size, texts.shape[0])
-            token_batch = ''
-
-            for ind in texts.index[start_batch: end_batch]:
-                token_batch += str([101] + tokenize(texts.loc[ind], tokenizer) + [102])[1:-1] + '\n'
-            with open(file_name, 'a') as f:
-                f.write(token_batch)
-            with open(file_name[:-3] + 'txt', 'w') as f:
-                f.write(f'{end_batch}')
-            progress_bar.update(end_batch - start_batch)
+    model.eval()
+    with notebook.tqdm(total=len(loader)) as progress_bar:
+        for batch in loader:
+            batch_mask = np.where(np.array(batch) != 0, 1, 0)
+            batch_tensor = batch.to(device)
+            batch_mask_tensor = LongTensor(batch_mask, device=device)
+            with torch.no_grad():
+                embed = model(batch_tensor, attention_mask=batch_mask_tensor).last_hidden_state
+                embed_cpu = pd.DataFrame(embed.cpu().numpy()[:,0])
+                embed_cpu.to_csv(file_name, index=False, header=None, mode='a')
+            progress_bar.update()
