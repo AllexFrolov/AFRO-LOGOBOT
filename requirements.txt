@@ -5,4 +5,5 @@ matplotlib==3.3.2
 h5py==2.10.0
 tensorflow==2.0.0
 Keras==2.4.3
+torch==1.6.0
 ISR==2.2.0
