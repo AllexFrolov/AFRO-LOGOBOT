@@ -3,5 +3,6 @@ opencv-python==4.4.0.44
 albumentations==0.4.6
 matplotlib==3.3.2
 h5py==2.10.0
-Keras==2.4.3
 tensorflow==2.0.0
+Keras==2.4.3
+ISR==2.2.0
