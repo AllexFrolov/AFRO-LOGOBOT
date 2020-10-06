@@ -1,8 +1,8 @@
 import torch
 import numpy as np
 
-from models import Generator, OldGenerator
-from wgan import GoodGenerator
+from .models import Generator
+from .wgan import GoodGenerator
 
 def gen_logo_color(weight_path="gen_logo_model.pt",  noise = None):
     
@@ -13,13 +13,14 @@ def gen_logo_color(weight_path="gen_logo_model.pt",  noise = None):
     """
 
     netG = GoodGenerator(dim=64, latent_dim = 128,  output_dim=3*64*64)
-    netG.load_state_dict(torch.load(weight_path))
+    netG.load_state_dict(torch.load(weight_path, map_location=torch.device('cpu')))
 
     netG.eval()
-    netG.cuda()
+    # netG.cuda()
 
     if not noise:
-        noise = torch.randn(1, 128, device="cuda")
+        # noise = torch.randn(1, 128, device="cuda")
+        noise = torch.randn(1, 128)
 
     with torch.no_grad():
         # Get generated image from the noise vector using

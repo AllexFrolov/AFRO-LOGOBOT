@@ -6,7 +6,7 @@ import cv2
 import numpy as np
 import pandas as pd
 from nltk.stem import WordNetLemmatizer
-from tqdm import notebook
+from tqdm import tqdm_notebook
 import torch
 
 lemmatizer = WordNetLemmatizer()
@@ -116,8 +116,10 @@ def add_text_to_img(text: str, icon_im: np.array) -> np.array:
     img1_bg = cv2.bitwise_and(roi, roi, mask=mask_inv)
 
     img2_fg = cv2.bitwise_and(text_im, text_im, mask=mask)
+    
+    # dst = cv2.add(img1_bg, img2_fg.astype('float') / 255.)
 
-    dst = cv2.add(img1_bg, img2_fg.astype(float) / 255.)
+    dst = cv2.add(img1_bg.astype('float'), img2_fg / 255)
     icon_im[int(brows / 2) - int(rows / 2):int(brows / 2) + int(rows / 2),
     int(bcols / 2) - int(cols / 2):int(bcols / 2) + int(cols / 2)] = dst
 
@@ -179,7 +181,7 @@ def embed_and_write_file(loader: Any, model: Any, device: torch.device, file_nam
         from torch import LongTensor
 
     model.eval()
-    with notebook.tqdm(total=len(loader)) as progress_bar:
+    with tqdm_notebook.tqdm(total=len(loader)) as progress_bar:
         for batch in loader:
             batch_mask = np.where(np.array(batch) != 0, 1, 0)
             batch_tensor = batch.to(device)

@@ -1,7 +1,11 @@
 import cv2
 import numpy as np
 import telebot 
-
+import time
+import png
+from utils import add_text_to_img
+from generator_part.logo_gen import gen_logo_color
+from afro_postprocess import superresolute, imgfilter
 bot_token = "1225147524:AAHSRA9T2dmlSCmHJgtzWvjjlXpvk7OauKM"
 bot = telebot.TeleBot(token = bot_token)
 
@@ -10,32 +14,28 @@ bot = telebot.TeleBot(token = bot_token)
 @bot.message_handler(commands = ['help', 'start'])
 def send_info(message):
     if message.text=='/start':
-        bot.send_message(message.from_user.id, 'Привет!\nЯ умею генерировать логотипы. Давай создадим логотип для твоей компании! 😋\nОтправь мне картинку с названием твоей компании.')
+        bot.send_message(message.from_user.id, 'Привет!\nЯ умею генерировать логотипы. Давай сгенерируем логотип для твоей компании! 😋\nОтправь мне название твоей компании.')
     elif message.text=='/help':
-        bot.send_message(message.from_user.id, 'Отправь мне картинку с названием твоей компании 👌🏿')
+        bot.send_message(message.from_user.id, 'Отправь мне название твоей компании 👌🏿')
 
 
-@bot.message_handler(content_types=['photo','document'])
-def picture_receiving(message):
-    # if document given
-    if message.document!=None:
-        bot.send_message(message.from_user.id, 'Я не работаю с файлами, дай мне фото')
-        return
-    image = message.photo[2]
-    # image dimensions
-    height = image.height
-    width = image.width
-    # getting the file by id
-    file_id_info = bot.get_file(image.file_id)
-    file_bytes = bot.download_file(file_id_info.file_path)
-    # saving user picture
-    with open("image.jpg", 'wb') as new_file:
-        new_file.write(file_bytes)
+@bot.message_handler()
+def company_receiving(message):
+    logo = gen_logo_color()
+    logo = imgfilter(superresolute(logo))
     
-    #picture = cv2.imread('image.jpg')
+    logo = add_text_to_img(message.text, logo)
+    
 
+    print('shape',logo.shape)
+    png.from_array(logo, mode="L").save("image.png")
+    
+    # picture = cv2.imread('image.jpg')
+    print(logo.tobytes())
     # sending picture to user
-    bot.send_photo(message.from_user.id, file_bytes, caption='TEST')
+    bot.send_photo(message.from_user.id, logo.tobytes(), caption='TEST')
+
+
 
 
 
