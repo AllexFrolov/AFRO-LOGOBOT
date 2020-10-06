@@ -59,4 +59,4 @@ The source of an images can be found [here](https://data.vision.ee.ethz.ch/sagea
 ## Acknowledgements
 
 * Andrei Spiridonov
-* [Open Data Science](ods.ai)
+* [Open Data Science](https://ods.ai/)
