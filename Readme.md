@@ -29,29 +29,34 @@ This telegram bot allows you to generate a logo for you from a certain set of ke
 ## Quickstart
 
 ## Requirements
+### Specification of dependencies
+- [OpenCV](https://opencv.org/) (An open source computer vision and machine learning software library)
+- [TensorFlow](https://opencv.org/) (An end-to-end open source machine learning platform)
+- [ISR](https://github.com/idealo/image-super-resolution) (An open source image super-resolution library)
 
-numpy==1.18.5
-opencv-python==4.4.0.44
-albumentations==0.4.6
-matplotlib==3.3.2
-h5py==2.10.0
-tensorflow==2.0.0
-Keras==2.4.3
-ISR==2.2.0
+If for some reason you choose not to use Anaconda, you must install the following frameworks and packages on your system:
+* Python 3.8
+* opencv 4.4.0
+* numpy 1.18.5
+* albumentations 0.4.6
+* matplotlib 3.3.2
+* h5py 2.10.0
+* tensorflow 2.0.0
+* Keras 2.4.3
+* ISR 2.2.0
+
+### Data
+The source of an images can be found [here](https://data.vision.ee.ethz.ch/sagea/lld/data/).
 
 ## Team
 
-\begin(itemize)
-  Aleksandr FROlov
-  Kirill BURovin
-  Rodion BUKhanevich
-  Bogdan TYShchenko
-  Aleksandr ISAkov
-\end(itemize)
+* Aleksandr FROlov
+* Kirill BURovin
+* Rodion BUKhanevich
+* Bogdan TYShchenko
+* Aleksandr ISAkov
 
 ## Acknowledgements
 
-\begin(itemize)
-  Andrei Spiridonov
-  Open Data Science (ods.ai)
-\end(itemize)
+* Andrei Spiridonov
+* [Open Data Science](ods.ai)
