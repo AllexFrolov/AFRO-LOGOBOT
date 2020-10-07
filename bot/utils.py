@@ -118,9 +118,9 @@ def add_text_to_img(text: str, icon_im: np.array) -> np.array:
     join_img = icon_im.copy()
     join_img = cv2.resize(join_img, dsize=(128, 98), interpolation=cv2.INTER_AREA)
     if np.random.randint(2) == 1:
-        join_img = np.concatenate((join_img, res_text / 255), axis=0)
+        join_img = np.concatenate((join_img, res_text), axis=0)
     else:
-        join_img = np.concatenate((res_text / 255, join_img), axis=0)
+        join_img = np.concatenate((res_text, join_img), axis=0)
     return join_img
 
 
