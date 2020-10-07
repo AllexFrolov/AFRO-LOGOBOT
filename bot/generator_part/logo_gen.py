@@ -6,21 +6,24 @@ import random
 from .models import Generator
 from .wgan import GoodGenerator
 
-def gen_logo_color(weight_path="gen_logo_model.pt",  noise = None):
+weight_path="gen_logo_model.pt"
+
+if random.random() > 0.5:
+    weight_path = "gen_logo_model_2.pt"
+
+netG = GoodGenerator(dim=64, latent_dim = 128,  output_dim=3*64*64)
+netG.load_state_dict(torch.load(weight_path, map_location=torch.device('cpu')))
+
+netG.eval()
+
+def gen_logo_color(noise = None):
     
     """
     Принимает на вход вектор шума либо генерит случайный
     затем генерирует картинку 64х64 и возвращает ее
     
     """
-
-    if random.random() > 0.5:
-    	weight_path = "gen_logo_model_2.pt"
-
-    netG = GoodGenerator(dim=64, latent_dim = 128,  output_dim=3*64*64)
-    netG.load_state_dict(torch.load(weight_path, map_location=torch.device('cpu')))
-
-    netG.eval()
+    
     # netG.cuda()
 
     if not noise:
