@@ -101,27 +101,27 @@ def add_text_to_img(text: str, icon_im: np.array) -> np.array:
     :param icon_im: (np.array) icon image
     :return: (np.array) joined image
     """
-    text_im = text_to_pic_transform(text)
-    brows, bcols = icon_im.shape[:2]
-    rows, cols, channels = text_im.shape
+    # transform text to image
+    text_img = text_to_pic_transform(text)
+    # get mask
+    img2gray = cv2.cvtColor(text_img, cv2.COLOR_BGR2GRAY)
+    mask = img2gray != 255
+    # crop extra space
+    height = mask.any(axis=1)
+    width = mask.any(axis=0)
+    ind = np.arange(len(mask))
+    w = ind[width][[0, -1]]
+    h = ind[height][[0, -1]]
+    cut_text_img = text_img[h[0]:h[1], w[0]:w[1]]
+    res_text = cv2.resize(cut_text_img, dsize=(128, 30), interpolation=cv2.INTER_AREA)
 
-    roi = icon_im[int(brows / 2) - int(rows / 2):int(brows / 2) + int(rows / 2),
-          int(bcols / 2) - int(cols / 2):int(bcols / 2) + int(cols / 2)]
-
-    img2gray = cv2.cvtColor(text_im, cv2.COLOR_BGR2GRAY)
-    ret, mask = cv2.threshold(img2gray, 10, 255, cv2.THRESH_BINARY)
-    # mask = cv2.adaptiveThreshold(img2gray, 1, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
-    mask_inv = cv2.bitwise_not(mask)
-
-    img1_bg = cv2.bitwise_and(roi, roi, mask=mask_inv)
-
-    img2_fg = cv2.bitwise_and(text_im, text_im, mask=mask)
-
-    dst = cv2.add(img1_bg, img2_fg.astype(float) / 255.)
-    icon_im[int(brows / 2) - int(rows / 2):int(brows / 2) + int(rows / 2),
-    int(bcols / 2) - int(cols / 2):int(bcols / 2) + int(cols / 2)] = dst
-
-    return icon_im
+    join_img = icon_im.copy()
+    join_img = cv2.resize(join_img, dsize=(128, 98), interpolation=cv2.INTER_AREA)
+    if np.random.randint(2) == 1:
+        join_img = np.concatenate((join_img, res_text / 255), axis=0)
+    else:
+        join_img = np.concatenate((res_text / 255, join_img), axis=0)
+    return join_img
 
 
 def lemmatize_and_clearing(text: str) -> str:
