@@ -6,7 +6,7 @@ import cv2
 import numpy as np
 import pandas as pd
 from nltk.stem import WordNetLemmatizer
-from tqdm import tqdm_notebook
+from tqdm import notebook
 import torch
 
 lemmatizer = WordNetLemmatizer()
@@ -20,7 +20,7 @@ def text_to_pic(text: str) -> np.array:
     :return: (numpy.array) array of shape (100, 200, 3)
     """
     # create canvas
-    canvas = np.full((500, 500, 3), 0, dtype=np.uint8)
+    canvas = np.full((1024, 1024, 3), 255, dtype=np.uint8)
     # choice random color
     color = tuple(np.random.choice(255) for _ in range(3))
     # choice random font
@@ -55,24 +55,25 @@ class Transformer(object):
         """
         init albumentation augmentations
         """
+        border_color = (255, 255, 255)
         self.transform = A.Compose([
             A.OneOf([
-                A.GridDistortion(7, 1., cv2.INTER_LINEAR, cv2.BORDER_REFLECT, p=.8),
+                A.GridDistortion(7, 1., cv2.INTER_LINEAR, cv2.BORDER_CONSTANT, value=border_color, p=.8),
                 A.ElasticTransform(1., alpha_affine=50, interpolation=cv2.INTER_CUBIC,
-                                   border_mode=cv2.BORDER_CONSTANT, value=(0, 0, 0), p=.8)
+                                   border_mode=cv2.BORDER_CONSTANT, value=border_color, p=.8)
             ], p=.5),
             A.OneOf([
-                A.Rotate(10, cv2.INTER_NEAREST, cv2.BORDER_REFLECT_101),
-                A.Rotate(10, cv2.INTER_NEAREST, cv2.BORDER_REPLICATE),
-                A.Rotate(10, cv2.INTER_NEAREST, cv2.BORDER_WRAP)
+                A.Rotate(10, cv2.INTER_NEAREST, cv2.BORDER_CONSTANT, value=border_color,),
+                A.Rotate(10, cv2.INTER_NEAREST, cv2.BORDER_CONSTANT, value=border_color,),
+                A.Rotate(10, cv2.INTER_NEAREST, cv2.BORDER_CONSTANT, value=border_color,)
             ], p=0.5),
             A.OneOf([
                 A.MotionBlur((15, 30)),
                 A.MedianBlur(blur_limit=3, p=0.5),
                 A.Blur(blur_limit=3, p=0.5),
             ], p=0.5),
-            A.ShiftScaleRotate(shift_limit=0.0625, scale_limit=0.2, rotate_limit=45, p=0.2),
-            A.Resize(128, 128, cv2.INTER_CUBIC)
+            # A.ShiftScaleRotate(shift_limit=0.0625, scale_limit=0.2, rotate_limit=45, p=0.2),
+            # A.Resize(128, 128, cv2.INTER_CUBIC)
         ])
 
     def __call__(self, img: Any) -> Any:
@@ -99,7 +100,7 @@ def add_text_to_img(text: str, icon_im: np.array) -> np.array:
     add text image to icon image.
     :param text: (str) text
     :param icon_im: (np.array) icon image
-    :return: (np.array) joined image
+    :return: (np.array) joined image. (h, w, c) type float
     """
     # transform text to image
     text_img = text_to_pic_transform(text)
@@ -179,7 +180,7 @@ def embed_and_write_file(loader: Any, model: Any, device: torch.device, file_nam
         from torch import LongTensor
 
     model.eval()
-    with tqdm_notebook.tqdm(total=len(loader)) as progress_bar:
+    with notebook.tqdm(total=len(loader)) as progress_bar:
         for batch in loader:
             batch_mask = np.where(np.array(batch) != 0, 1, 0)
             batch_tensor = batch.to(device)
