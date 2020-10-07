@@ -26,7 +26,7 @@ This telegram bot allows you to generate a logo for you from a certain set of ke
 ### Architecture
 
 <p align="center">
-<img src="img/sample.png" alt>
+<img src="img/DCGAN.png" alt>
 
 </p>
 <p align="center">
@@ -82,13 +82,13 @@ iWGAN-GP output:
 
 <p float="left">
   <img src="img/res1.png" width="100" />
-  <img src="/res2.png" width="100" />
+  <img src="img/res2.png" width="100" />
 </p>
 
 StyleGAN2 output:
 
 <p align="center">
-<img src="img/iWGAN1.jpeg" alt>
+<img src="img/stylegan2.jpg" alt>
 
 ## Team
 
