@@ -20,7 +20,7 @@ def superresolute(lr_img, scale=2):
 
     return lr_img
 
-def imgfilter(img, radius=3):
+def imgfilter(img, radius=3, edges=2):
     """
     Takes the image and removes the noise with little affect to resolution
     Input: PIL Image, Output: PIL Image
@@ -28,7 +28,8 @@ def imgfilter(img, radius=3):
     assert type(img) == np.ndarray
     img = Image.fromarray(img)
     lol = img.filter(ImageFilter.GaussianBlur(radius=radius))
-    lol2 = lol.filter(ImageFilter.EDGE_ENHANCE_MORE)
-    final_img = np.array(lol2)
+    for i in range(edges):
+        lol = lol.filter(ImageFilter.EDGE_ENHANCE_MORE)
+    final_img = np.array(lol)
     return final_img
 
