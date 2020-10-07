@@ -20,7 +20,7 @@ def text_to_pic(text: str) -> np.array:
     :return: (numpy.array) array of shape (100, 200, 3)
     """
     # create canvas
-    canvas = np.full((500, 500, 3), 0, dtype=np.uint8)
+    canvas = np.full((1024, 1024, 3), 255, dtype=np.uint8)
     # choice random color
     color = tuple(np.random.choice(255) for _ in range(3))
     # choice random font
@@ -55,24 +55,25 @@ class Transformer(object):
         """
         init albumentation augmentations
         """
+        border_color = (255, 255, 255)
         self.transform = A.Compose([
             A.OneOf([
-                A.GridDistortion(7, 1., cv2.INTER_LINEAR, cv2.BORDER_REFLECT, p=.8),
+                A.GridDistortion(7, 1., cv2.INTER_LINEAR, cv2.BORDER_CONSTANT, value=border_color, p=.8),
                 A.ElasticTransform(1., alpha_affine=50, interpolation=cv2.INTER_CUBIC,
-                                   border_mode=cv2.BORDER_CONSTANT, value=(0, 0, 0), p=.8)
+                                   border_mode=cv2.BORDER_CONSTANT, value=border_color, p=.8)
             ], p=.5),
             A.OneOf([
-                A.Rotate(10, cv2.INTER_NEAREST, cv2.BORDER_REFLECT_101),
-                A.Rotate(10, cv2.INTER_NEAREST, cv2.BORDER_REPLICATE),
-                A.Rotate(10, cv2.INTER_NEAREST, cv2.BORDER_WRAP)
+                A.Rotate(10, cv2.INTER_NEAREST, cv2.BORDER_CONSTANT, value=border_color,),
+                A.Rotate(10, cv2.INTER_NEAREST, cv2.BORDER_CONSTANT, value=border_color,),
+                A.Rotate(10, cv2.INTER_NEAREST, cv2.BORDER_CONSTANT, value=border_color,)
             ], p=0.5),
             A.OneOf([
                 A.MotionBlur((15, 30)),
                 A.MedianBlur(blur_limit=3, p=0.5),
                 A.Blur(blur_limit=3, p=0.5),
             ], p=0.5),
-            A.ShiftScaleRotate(shift_limit=0.0625, scale_limit=0.2, rotate_limit=45, p=0.2),
-            A.Resize(128, 128, cv2.INTER_CUBIC)
+            # A.ShiftScaleRotate(shift_limit=0.0625, scale_limit=0.2, rotate_limit=45, p=0.2),
+            # A.Resize(128, 128, cv2.INTER_CUBIC)
         ])
 
     def __call__(self, img: Any) -> Any:
@@ -101,27 +102,27 @@ def add_text_to_img(text: str, icon_im: np.array) -> np.array:
     :param icon_im: (np.array) icon image
     :return: (np.array) joined image
     """
-    text_im = text_to_pic_transform(text)
-    brows, bcols = icon_im.shape[:2]
-    rows, cols, channels = text_im.shape
+    # transform text to image
+    text_img = text_to_pic_transform(text)
+    # get mask
+    img2gray = cv2.cvtColor(text_img, cv2.COLOR_BGR2GRAY)
+    mask = img2gray != 255
+    # crop extra space
+    height = mask.any(axis=1)
+    width = mask.any(axis=0)
+    ind = np.arange(len(mask))
+    w = ind[width][[0, -1]]
+    h = ind[height][[0, -1]]
+    cut_text_img = text_img[h[0]:h[1], w[0]:w[1]]
+    res_text = cv2.resize(cut_text_img, dsize=(128, 30), interpolation=cv2.INTER_AREA)
 
-    roi = icon_im[int(brows / 2) - int(rows / 2):int(brows / 2) + int(rows / 2),
-          int(bcols / 2) - int(cols / 2):int(bcols / 2) + int(cols / 2)]
-
-    img2gray = cv2.cvtColor(text_im, cv2.COLOR_BGR2GRAY)
-    ret, mask = cv2.threshold(img2gray, 10, 255, cv2.THRESH_BINARY)
-    # mask = cv2.adaptiveThreshold(img2gray, 1, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
-    mask_inv = cv2.bitwise_not(mask)
-
-    img1_bg = cv2.bitwise_and(roi, roi, mask=mask_inv)
-
-    img2_fg = cv2.bitwise_and(text_im, text_im, mask=mask)
-
-    dst = cv2.add(img1_bg, img2_fg.astype(float) / 255.)
-    icon_im[int(brows / 2) - int(rows / 2):int(brows / 2) + int(rows / 2),
-    int(bcols / 2) - int(cols / 2):int(bcols / 2) + int(cols / 2)] = dst
-
-    return icon_im
+    join_img = icon_im.copy()
+    join_img = cv2.resize(join_img, dsize=(128, 98), interpolation=cv2.INTER_AREA)
+    if np.random.randint(2) == 1:
+        join_img = np.concatenate((join_img, res_text / 255), axis=0)
+    else:
+        join_img = np.concatenate((res_text / 255, join_img), axis=0)
+    return join_img
 
 
 def lemmatize_and_clearing(text: str) -> str:
