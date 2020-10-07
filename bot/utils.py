@@ -6,7 +6,7 @@ import cv2
 import numpy as np
 import pandas as pd
 from nltk.stem import WordNetLemmatizer
-from tqdm import notebook
+from tqdm import tqdm_notebook
 import torch
 
 lemmatizer = WordNetLemmatizer()
@@ -179,7 +179,7 @@ def embed_and_write_file(loader: Any, model: Any, device: torch.device, file_nam
         from torch import LongTensor
 
     model.eval()
-    with notebook.tqdm(total=len(loader)) as progress_bar:
+    with tqdm_notebook.tqdm(total=len(loader)) as progress_bar:
         for batch in loader:
             batch_mask = np.where(np.array(batch) != 0, 1, 0)
             batch_tensor = batch.to(device)

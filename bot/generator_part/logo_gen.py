@@ -1,25 +1,34 @@
 import torch
 import numpy as np
+import random
 
-from models import Generator, OldGenerator
-from wgan import GoodGenerator
 
-def gen_logo_color(weight_path="gen_logo_model.pt",  noise = None):
+from .models import Generator
+from .wgan import GoodGenerator
+
+weight_path="gen_logo_model.pt"
+
+if random.random() > 0.5:
+    weight_path = "gen_logo_model_2.pt"
+
+netG = GoodGenerator(dim=64, latent_dim = 128,  output_dim=3*64*64)
+netG.load_state_dict(torch.load(weight_path, map_location=torch.device('cpu')))
+
+netG.eval()
+
+def gen_logo_color(noise = None):
     
     """
     Принимает на вход вектор шума либо генерит случайный
     затем генерирует картинку 64х64 и возвращает ее
     
     """
-
-    netG = GoodGenerator(dim=64, latent_dim = 128,  output_dim=3*64*64)
-    netG.load_state_dict(torch.load(weight_path))
-
-    netG.eval()
-    netG.cuda()
+    
+    # netG.cuda()
 
     if not noise:
-        noise = torch.randn(1, 128, device="cuda")
+        # noise = torch.randn(1, 128, device="cuda")
+        noise = torch.randn(1, 128)
 
     with torch.no_grad():
         # Get generated image from the noise vector using
