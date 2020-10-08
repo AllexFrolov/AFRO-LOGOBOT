@@ -2,3 +2,5 @@
 /.idea
 /Data
 /.ipynb_checkpoints
+/bot/config
+/bot/bot.zip
