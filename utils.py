@@ -3,13 +3,13 @@ from typing import Tuple, Any, Optional, List, Union
 
 import albumentations as A
 import cv2
-from PIL import Image
 import numpy as np
 import pandas as pd
+import torch
+from PIL import Image
+import random
 from nltk.stem import WordNetLemmatizer
 from tqdm import notebook
-import torch
-
 
 lemmatizer = WordNetLemmatizer()
 
@@ -36,7 +36,7 @@ def text_to_pic(text: str) -> np.array:
     return canvas
 
 
-def get_center(text_size: Tuple[int, int], canvas: np.array,) -> Tuple[int, int]:
+def get_center(text_size: Tuple[int, int], canvas: np.array, ) -> Tuple[int, int]:
     """
     get center coordinate fot text
     :param text_size: (Tuplt[int, int])
@@ -62,9 +62,9 @@ class Transformer(object):
                                    border_mode=cv2.BORDER_CONSTANT, value=border_color, p=.8)
             ], p=1.),
             A.OneOf([
-                A.Rotate(10, cv2.INTER_NEAREST, cv2.BORDER_CONSTANT, value=border_color,),
-                A.Rotate(10, cv2.INTER_NEAREST, cv2.BORDER_CONSTANT, value=border_color,),
-                A.Rotate(10, cv2.INTER_NEAREST, cv2.BORDER_CONSTANT, value=border_color,)
+                A.Rotate(10, cv2.INTER_NEAREST, cv2.BORDER_CONSTANT, value=border_color, ),
+                A.Rotate(10, cv2.INTER_NEAREST, cv2.BORDER_CONSTANT, value=border_color, ),
+                A.Rotate(10, cv2.INTER_NEAREST, cv2.BORDER_CONSTANT, value=border_color, )
             ], p=0.5),
             A.OneOf([
                 A.MotionBlur((15, 30)),
@@ -156,7 +156,7 @@ def rotate_bound(image, angle):
 
 
 def add_logo_to_pic(logo: np.array, pic: Union[np.array, str], coord: List[int],
-                    angle: Optional[int]=None) -> np.array:
+                    angle: Optional[int] = None) -> np.array:
     """
     Added logo to picture
     :param logo: (uint8 array) Logo
@@ -166,22 +166,21 @@ def add_logo_to_pic(logo: np.array, pic: Union[np.array, str], coord: List[int],
     :return: (np.array) joined image. (h, w, c) type uint8
     """
     logo_ = logo.copy()
-    h, w, _ = logo.shape
     if angle is not None:
-        logo_ = rotate_bound(logo_, -10)
+        logo_ = rotate_bound(logo_, angle)
     img2gray = logo_.mean(axis=-1)
-    mask = img2gray < 255
-
+    logo_mask = img2gray < 255
+    h, w, _ = logo_.shape
     if isinstance(pic, str):
         joined_img = np.array(Image.open(pic))
     else:
         joined_img = pic.copy()
     joined_img[coord[0]:coord[0] + h,
-    coord[1]:coord[1] + w][mask] = logo_[mask]
+    coord[1]:coord[1] + w][logo_mask] = logo_[logo_mask]
     return joined_img
 
 
-def get_examples(logo: np.array, examples: Union[List[str], str]) -> np.array:
+def get_examples(logo: np.array, examples: str) -> np.array:
     """
 
     :param logo: (np.array)
@@ -190,16 +189,17 @@ def get_examples(logo: np.array, examples: Union[List[str], str]) -> np.array:
     """
     examp_preset = {
         'man': {
-                'pic': 'img/man.jpg',
-                'coord': [195, 235],
-                'angle': -10
-                }
+            'pic': 'img/man.jpg',
+            'coord': [205, 245],
+            'angle': -4
+        },
+        'bad_guy': {
+            'pic': 'img/bad_guy.jpg',
+            'coord': [130, 205],
+        }
     }
-
-    return add_logo_to_pic(logo, **examp_preset[examples])
-
-
-
+    exp = random.choice(list(examp_preset))
+    return add_logo_to_pic(logo, **examp_preset[exp])
 
 
 def lemmatize_and_clearing(text: str) -> str:
@@ -264,6 +264,6 @@ def embed_and_write_file(loader: Any, model: Any, device: torch.device, file_nam
             batch_mask_tensor = LongTensor(batch_mask, device=device)
             with torch.no_grad():
                 embed = model(batch_tensor, attention_mask=batch_mask_tensor).last_hidden_state
-                embed_cpu = pd.DataFrame(embed.cpu().numpy()[:,0])
+                embed_cpu = pd.DataFrame(embed.cpu().numpy()[:, 0])
                 embed_cpu.to_csv(file_name, index=False, header=None, mode='a')
             progress_bar.update()

@@ -7,6 +7,7 @@ import numpy as np
 import pandas as pd
 import torch
 from PIL import Image
+import random
 from nltk.stem import WordNetLemmatizer
 from tqdm import notebook
 
@@ -197,8 +198,8 @@ def get_examples(logo: np.array, examples: str) -> np.array:
             'coord': [130, 205],
         }
     }
-
-    return add_logo_to_pic(logo, **examp_preset[examples])
+    exp = random.choice(list(examp_preset))
+    return add_logo_to_pic(logo, **examp_preset[exp])
 
 
 def lemmatize_and_clearing(text: str) -> str:
