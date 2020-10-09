@@ -21,7 +21,6 @@ bot = telebot.TeleBot(bot_token)
 def send_info(message):
     if message.text == '/start':
         bot.send_message(message.from_user.id, 'Привет!\nЯ умею генерировать логотипы. Давай сгенерируем логотип для твоей компании! 😋\nОтправь мне название твоей компании.')
-        bot.send_photo(message.from_user.id, img)
 
     elif message.text == '/help':
         img = Image.open('img/help.jpg')
@@ -70,7 +69,7 @@ def process_callback(query):
     try:
         img = Image.open('query.img')
         encod_img = np.array(img)
-        result = get_examples(encod_img,  'any')
+        result = get_examples(encod_img)
         result = Image.fromarray(result)
         bot.send_photo(query.from_user.id, result)
     except Exception as e:
