@@ -180,11 +180,10 @@ def add_logo_to_pic(logo: np.array, pic: Union[np.array, str], coord: List[int],
     return joined_img
 
 
-def get_examples(logo: np.array, examples: str) -> np.array:
+def get_examples(logo: np.array) -> np.array:
     """
 
     :param logo: (np.array)
-    :param examples: (Union[List[str], str])
     :return:
     """
     examp_preset = {
