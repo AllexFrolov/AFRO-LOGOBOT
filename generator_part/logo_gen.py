@@ -6,7 +6,7 @@ import random
 from .models import Generator
 from .wgan import GoodGenerator
 
-weight_path="gen_logo_model.pt"
+weight_path= "gen_logo_model.pt"
 
 if random.random() > 0.5:
     weight_path = "gen_logo_model_2.pt"

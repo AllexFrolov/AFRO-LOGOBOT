@@ -7,22 +7,24 @@ from PIL import Image, ImageFilter
 
 if __name__ == '__main__':
     print('Hallo, Afro super resolutor is here!')
-    
+
 # model formation out of function for speed
 rdn = RDN(weights='psnr-small')
+
 
 def superresolute(lr_img, scale=2):
     """
     Takes an image with low resolution and increases it
     Input: PIL Image, Output: PIL Image
     """
-    
+
     assert type(lr_img) == np.ndarray
-    
-    lr_img = lr_img*255
+
+    lr_img = lr_img * 255
     for _ in range(scale):
-      lr_img = rdn.predict(lr_img, by_patch_of_size=50)
+        lr_img = rdn.predict(lr_img, by_patch_of_size=50)
     return lr_img
+
 
 def imgfilter(img, radius=3):
     """

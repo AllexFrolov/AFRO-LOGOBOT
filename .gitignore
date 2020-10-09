@@ -2,6 +2,6 @@
 /.idea
 /Data
 /.ipynb_checkpoints
-/bot/config
-/bot/config.py
-/bot/bot.zip
+/workflow/.ipynb_checkpoints/
+/config.py
+/bert_model/
