@@ -3,4 +3,5 @@
 /Data
 /.ipynb_checkpoints
 /bot/config
+/bot/config.py
 /bot/bot.zip
