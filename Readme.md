@@ -1,4 +1,4 @@
-# AFRO project (Automotive, Fast, Responsible, Opensource)
+# AFRO LOGOBOT (Automotive, Fast, Responsible, Opensource)
 
 <p float="left">
   <img src="img/afro_logo.jpg" width="100" />
