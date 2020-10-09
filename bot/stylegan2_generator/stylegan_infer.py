@@ -10,7 +10,7 @@ from torchvision import utils
 from skimage import io
 import matplotlib.pyplot as plt
 
-from model import Generator
+from .model import Generator
 
 
 pics = 1
@@ -18,7 +18,7 @@ sample = 1
 size = 32
 truncation = 0.5
 truncation_mean = 4096
-ckpt = "icons_gen.pt"
+ckpt = "stylegan2_generator/icons_gen.pt"
 #ckpt = "../networks/torch_networks/stylegan2-ffhq-config-f.pt"
 latent = 512
 n_mlp = 8

@@ -5,8 +5,10 @@ import telebot
 from PIL import Image
 from config import token
 import numpy as np
-from generator_part.logo_gen import gen_logo_color
 from telebot import types
+
+# from generator_part.logo_gen import gen_logo_color
+from stylegan2_generator.stylegan_infer import model
 
 from afro_postprocess import superresolute, imgfilter
 from utils import add_text_to_img, get_examples
@@ -18,7 +20,7 @@ bot = telebot.TeleBot(bot_token)
 @bot.message_handler(commands=['help', 'start'])
 def send_info(message):
     if message.text == '/start':
-        img = Image.open('img/help.jpg')
+        bot.send_message(message.from_user.id, 'Привет!\nЯ умею генерировать логотипы. Давай сгенерируем логотип для твоей компании! 😋\nОтправь мне название твоей компании.')
         bot.send_photo(message.from_user.id, img)
 
     elif message.text == '/help':
@@ -26,11 +28,16 @@ def send_info(message):
         bot.send_photo(message.from_user.id, img)
 
 
+@bot.message_handler(content_types=["sticker", "pinned_message", "photo", "audio"])
+def send_info(message):
+    bot.send_message(message.from_user.id, 'Ха-ха😄 Очень смешно!')
+
 @bot.message_handler()
 def company_receiving(message):
 
     # generating logo
-    logo = gen_logo_color()
+    # logo = gen_logo_color()
+    logo = model.generate_logo()
     # applying superresolution and filtering
     logo = superresolute(logo)
     logo = imgfilter(logo)
@@ -41,7 +48,7 @@ def company_receiving(message):
     # create keyboard
     keyboard = types.InlineKeyboardMarkup()
     # create button
-    url_button = types.InlineKeyboardButton(text="Примеры", callback_data='123')
+    url_button = types.InlineKeyboardButton(text="Получить мем", callback_data='123')
     # add button to keyboard
     keyboard.add(url_button)
     # sending picture with keyboard to user
