@@ -1,7 +1,7 @@
 # AFRO project (Automotive, Fast, Responsible, Opensource)
 
 <p float="left">
-  <img src="img/afro_logo.jpg" width="100" />
+  <img src="images/afro_logo.jpg" width="100" />
 </p>
 
 ## Objective
@@ -26,7 +26,7 @@ This telegram bot allows you to generate a logo for you from a certain set of ke
 ### Architecture
 
 <p align="center">
-<img src="img/DCGAN.png" alt>
+<img src="images/DCGAN.png" alt>
 
 </p>
 <p align="center">
@@ -34,7 +34,7 @@ This telegram bot allows you to generate a logo for you from a certain set of ke
 </p>
 
 <p align="center">
-<img src="img/iWGAN1.jpeg" alt>
+<img src="images/iWGAN1.jpeg" alt>
 
 </p>
 <p align="center">
@@ -81,14 +81,14 @@ The source of images can be found [here](https://data.vision.ee.ethz.ch/sagea/ll
 iWGAN-GP output:
 
 <p float="left">
-  <img src="img/res1.png" width="100" />
-  <img src="img/res2.png" width="100" />
+  <img src="images/res1.png" width="100" />
+  <img src="images/res2.png" width="100" />
 </p>
 
 StyleGAN2 output:
 
 <p align="center">
-<img src="img/stylegan2.jpg" alt>
+<img src="images/stylegan2.jpg" alt>
 
 ## Team
 
