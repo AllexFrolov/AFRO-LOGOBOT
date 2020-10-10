@@ -182,9 +182,9 @@ def add_logo_to_pic(logo: np.array, pic: Union[np.array, str], coord: List[int],
 
 def get_examples(logo: np.array) -> np.array:
     """
-
+    return random choice meme and return logo into meme
     :param logo: (np.array)
-    :return:
+    :return: (np.array (h, v, c) uint8)
     """
     examp_preset = {
         'man': {
@@ -195,6 +195,10 @@ def get_examples(logo: np.array) -> np.array:
         'bad_guy': {
             'pic': 'img/bad_guy.jpg',
             'coord': [130, 205],
+        },
+        'svetlacov': {
+        'pic': 'img/Svetlakov.jpg',
+        'coord': [115, 220],
         }
     }
     exp = random.choice(list(examp_preset))
