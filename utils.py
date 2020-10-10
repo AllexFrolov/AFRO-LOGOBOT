@@ -265,8 +265,5 @@ def embed_and_write_file(loader: Any, model: Any, device: torch.device, file_nam
                 embed = model(batch_tensor, attention_mask=batch_mask_tensor).last_hidden_state
                 embed_cpu = pd.DataFrame(embed.cpu().numpy()[:, 0])
                 embed_cpu.to_csv(file_name, index=False, header=None, mode='a')
-<<<<<<< HEAD
             progress_bar.update()
-=======
-            progress_bar.update()
->>>>>>> 52f8f89103f2b4c1bea426495616c0a48d3c8f47
+
