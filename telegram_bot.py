@@ -1,13 +1,14 @@
 import time
 
 import requests
+import random
 import telebot
 from PIL import Image
 from config import token
 import numpy as np
 from telebot import types
 
-# from generator_part.logo_gen import gen_logo_color
+from generator_part.logo_gen import gen_logo_color
 from stylegan2_generator.stylegan_infer import model
 
 from afro_postprocess import superresolute, imgfilter
@@ -35,8 +36,10 @@ def send_info(message):
 def company_receiving(message):
 
     # generating logo
-    # logo = gen_logo_color()
-    logo = model.generate_logo()
+    if random.random() > 0.6:
+        logo = gen_logo_color()
+    else:
+        logo = model.generate_logo()
     # applying superresolution and filtering
     logo = superresolute(logo)
     logo = imgfilter(logo)
