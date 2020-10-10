@@ -66,11 +66,11 @@ class Transformer(object):
                 A.Rotate(10, cv2.INTER_NEAREST, cv2.BORDER_CONSTANT, value=border_color, ),
                 A.Rotate(10, cv2.INTER_NEAREST, cv2.BORDER_CONSTANT, value=border_color, )
             ], p=0.5),
-            A.OneOf([
-                A.MotionBlur((15, 30)),
-                A.MedianBlur(blur_limit=3, p=0.5),
-                A.Blur(blur_limit=3, p=0.5),
-            ], p=0.5),
+            #A.OneOf([
+            #    A.MotionBlur((15, 30)),
+            #    A.MedianBlur(blur_limit=3, p=0.5),
+            #    A.Blur(blur_limit=3, p=0.5),
+            #], p=0.5),
             # A.ShiftScaleRotate(shift_limit=0.0625, scale_limit=0.2, rotate_limit=45, p=0.2),
             # A.Resize(128, 128, cv2.INTER_CUBIC)
         ])
