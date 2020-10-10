@@ -22,7 +22,7 @@ def superresolute(lr_img, scale=2):
 
     lr_img = lr_img * 255
     for _ in range(scale):
-        lr_img = rdn.predict(lr_img, by_patch_of_size=50)
+        lr_img = rdn.predict(lr_img)
     return lr_img
 
 
