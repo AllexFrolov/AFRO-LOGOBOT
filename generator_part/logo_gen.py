@@ -6,7 +6,7 @@ import random
 from .models import Generator
 from .wgan import GoodGenerator32
 
-weight_path= "gen_logo_model_wgan.pt"
+weight_path= "generator_part/gen_logo_model_wgan.pt"
 
 
 netG = GoodGenerator32(dim=64, latent_dim = 128,  output_dim=3*32*32)
