@@ -4,14 +4,13 @@ import random
 
 
 from .models import Generator
-from .wgan import GoodGenerator
+from .wgan import GoodGenerator32
 
-weight_path= "gen_logo_model.pt"
+weight_path= "gen_logo_model_wgan.pt"
 
-if random.random() > 0.5:
-    weight_path = "gen_logo_model_2.pt"
 
-netG = GoodGenerator(dim=64, latent_dim = 128,  output_dim=3*64*64)
+
+netG = GoodGenerator32(dim=64, latent_dim = 128,  output_dim=3*32*32)
 netG.load_state_dict(torch.load(weight_path, map_location=torch.device('cpu')))
 
 netG.eval()

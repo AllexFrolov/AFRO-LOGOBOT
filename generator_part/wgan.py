@@ -166,32 +166,43 @@ class GoodGenerator(nn.Module):
     def sample_latent(self, num_samples):
         return torch.randn((num_samples, self.latent_dim))
 
-class GoodDiscriminator(nn.Module):
-    def __init__(self, dim=64):
-        super(GoodDiscriminator, self).__init__()
+class GoodGenerator32(nn.Module):
+    def __init__(self, dim=32, latent_dim = 128,  output_dim=3*32*32):
+        super(GoodGenerator32, self).__init__()
 
         self.dim = dim
+        self.latent_dim = latent_dim
 
         self.ssize = self.dim // 16
-        self.conv1 = MyConvo2d(3, self.dim, 3, he_init = False)
-        self.rb1 = ResidualBlock(self.dim, 2*self.dim, 3, resample = 'down', hw=self.dim)
-        self.rb2 = ResidualBlock(2*self.dim, 4*self.dim, 3, resample = 'down', hw=int(self.dim/2))
-        self.rb3 = ResidualBlock(4*self.dim, 8*self.dim, 3, resample = 'down', hw=int(self.dim/4))
-        self.rb4 = ResidualBlock(8*self.dim, 8*self.dim, 3, resample = 'down', hw=int(self.dim/8))
-        self.ln1 = nn.Linear(self.ssize*self.ssize*8*self.dim, 1)
+        self.ln1 = nn.Linear(128, self.ssize*self.ssize*8*self.dim)
+        #self.rb1 = ResidualBlock(8*self.dim, 8*self.dim, 3, resample = 'up')
+        self.rb2 = ResidualBlock(8*self.dim, 4*self.dim, 3, resample = 'up')
+        self.rb3 = ResidualBlock(4*self.dim, 2*self.dim, 3, resample = 'up')
+        self.rb4 = ResidualBlock(2*self.dim, 1*self.dim, 3, resample = 'up')
+        self.bn  = nn.BatchNorm2d(self.dim)
+
+        self.conv1 = MyConvo2d(1*self.dim, 3, 3)
+        self.relu = nn.ReLU()
+        self.tanh = nn.Tanh()
 
     def forward(self, input):
-        output = input.contiguous()
-        output = output.view(-1, 3, self.dim, self.dim)
-        output = self.conv1(output)
-        output = self.rb1(output)
+        output = self.ln1(input.contiguous())
+        output = output.view(-1, 8*self.dim, self.ssize, self.ssize)
+        #output = self.rb1(output)
         output = self.rb2(output)
         output = self.rb3(output)
         output = self.rb4(output)
-        output = output.view(-1, self.ssize*self.ssize*8*self.dim)
-        output = self.ln1(output)
-        output = output.view(-1)
+
+        output = self.bn(output)
+        output = self.relu(output)
+        output = self.conv1(output)
+        output = self.tanh(output)
+        #output = output.reshape(-1, 3 * self.dim * self.dim)
+        #print(output.shape)
         return output
+    
+    def sample_latent(self, num_samples):
+        return torch.randn((num_samples, self.latent_dim))
 
     
 def kaiming_init(m):
