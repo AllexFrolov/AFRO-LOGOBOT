@@ -1,0 +1,7 @@
+/venv
+/.idea
+/Data
+/.ipynb_checkpoints
+/workflow/.ipynb_checkpoints/
+/config.py
+/bert_model/
