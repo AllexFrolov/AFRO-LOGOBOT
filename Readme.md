@@ -65,7 +65,7 @@ If for some reason you choose not to use Anaconda, you must install the followin
 * albumentations 0.4.6
 * matplotlib 3.3.2
 * h5py 2.10.0
-* tensorflow 2.0.0
+* tensorflow 2.3.1
 * Keras 2.4.3
 * ISR 2.2.0
 * torch 1.4.0
