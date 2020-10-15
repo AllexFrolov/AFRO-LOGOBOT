@@ -1,17 +1,10 @@
-import re
 from typing import Tuple, Any, Optional, List, Union
 
 import albumentations as A
 import cv2
 import numpy as np
-import pandas as pd
-import torch
 from PIL import Image
 import random
-from nltk.stem import WordNetLemmatizer
-from tqdm import notebook
-
-lemmatizer = WordNetLemmatizer()
 
 
 def text_to_pic(text: str) -> np.array:
@@ -197,71 +190,4 @@ def get_examples(logo: np.array) -> np.array:
     }
     exp = random.choice(list(examp_preset))
     return add_logo_to_pic(logo, **examp_preset[exp])
-
-
-def lemmatize_and_clearing(text: str) -> str:
-    """
-    lemmatize text and save symbols only
-    :param text: (str) text
-    :return: (str) lemmatized text
-    """
-    clear_list = ' '.join(re.sub(r'\\n|\W|\d', ' ', text).split()).lower()
-    lemm_list = lemmatizer.lemmatize(clear_list)
-    return ''.join(lemm_list)
-
-
-def tokenize(text: str, tokenizer: Any) -> str:
-    """Splits a string into substrings of no more than 510 length and tokenizes
-    :param text: (str) text
-    :param tokenizer: (func) tokenizer
-    :return: (str) tokenized text
-    """
-    if len(text) > 510:
-        space_index = text.strip().rfind(' ', 0, 510)
-        if space_index == -1:
-            space_index = 510
-        return tokenizer.encode(text[:space_index])[1:-1] + tokenize(text[space_index:], tokenizer)
-    else:
-        return tokenizer.encode(text)[1:-1]
-
-
-def find_file(file_name: str) -> Optional[str]:
-    """
-    Read and return first line in file.
-    :param file_name: (str) full path to fiile
-    :return: ([str]) file
-    """
-    try:
-        with open(file_name[:-3] + 'txt', 'r') as f:
-            any_data = f.readline()
-        return any_data
-    except:
-        return None
-
-
-def embed_and_write_file(loader: Any, model: Any, device: torch.device, file_name: str):
-    """
-    convert vec to embedding and save to file
-    :param loader: (Any) DataLoader
-    :param model: (Any) Embed_model
-    :param device: (torch.device)
-    :param file_name: (str) path to save the file
-    :return: NoneType
-    """
-    if device.type == 'cuda':
-        from torch.cuda import LongTensor
-    else:
-        from torch import LongTensor
-
-    model.eval()
-    with notebook.tqdm(total=len(loader)) as progress_bar:
-        for batch in loader:
-            batch_mask = np.where(np.array(batch) != 0, 1, 0)
-            batch_tensor = batch.to(device)
-            batch_mask_tensor = LongTensor(batch_mask, device=device)
-            with torch.no_grad():
-                embed = model(batch_tensor, attention_mask=batch_mask_tensor).last_hidden_state
-                embed_cpu = pd.DataFrame(embed.cpu().numpy()[:, 0])
-                embed_cpu.to_csv(file_name, index=False, header=None, mode='a')
-            progress_bar.update()
 
