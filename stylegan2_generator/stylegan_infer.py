@@ -1,17 +1,6 @@
-import os
 import torch
-import random
-import cv2
-import numpy as np
-import torch.nn as nn
-import torch.nn.functional as F
-from tqdm import tqdm
-from torchvision import utils
-from skimage import io
-import matplotlib.pyplot as plt
 
 from .model import Generator
-
 
 pics = 1
 sample = 1
@@ -19,7 +8,7 @@ size = 32
 truncation = 0.5
 truncation_mean = 4096
 ckpt = "stylegan2_generator/icons_gen.pt"
-#ckpt = "../networks/torch_networks/stylegan2-ffhq-config-f.pt"
+# ckpt = "../networks/torch_networks/stylegan2-ffhq-config-f.pt"
 latent = 512
 n_mlp = 8
 
@@ -37,13 +26,13 @@ class GenModel(object):
             param.requires_grad = False
         self.backbone.to(device)
         self.mean_latent = self.backbone.mean_latent(truncation_mean)
-        
+
     def generate_logo(self):
         sample_z = torch.randn(sample, latent, device=device)
         x = self.backbone([sample_z], truncation=truncation, truncation_latent=self.mean_latent)
-        
-        return x[0].cpu().detach().numpy().squeeze().transpose(1,2,0)
-    
+
+        return x[0].cpu().detach().numpy().squeeze().transpose(1, 2, 0)
+
 
 model = GenModel()
 model.generate_logo()

@@ -1,7 +1,5 @@
 import numpy as np
 
-# !pip install tensorflow==2.2.0
-# !pip install ISR
 from ISR.models import RDN
 from PIL import Image, ImageFilter
 
