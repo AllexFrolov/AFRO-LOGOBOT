@@ -7,6 +7,5 @@ torchvision==0.7.0
 opencv-python==4.4.0.44
 ninja==1.10.0.post2
 ISR==2.2.0
-# cpp==1.0.0.6
 albumentations==0.4.6
 cl==0.0.3
